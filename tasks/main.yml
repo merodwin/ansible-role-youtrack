@@ -1,0 +1,49 @@
+---
+# tasks file for ansible-role-youtrack/
+
+
+
+
+- name: install unzip
+  become: true
+  apt: name=unzip state=latest
+
+- name: create youtrack group
+  become: yes
+  group: name={{youtrack_group}} state=present
+
+- name: create youtrack user
+  become: yes
+  user: name="{{youtrack_user}}" group={{youtrack_group}} state=present
+
+- name: download youtrack
+  get_url: url="https://download-cf.jetbrains.com/charisma/youtrack-{{youtrack_version}}.zip" dest="{{download_directory}}/youtrack{{youtrack_version}}.zip" validate_certs=False
+
+- name: check if allredy installed
+  stat: path="{{youtrack_install_folder}}/youtrack-{{youtrack_version}}"
+  register: installDir
+
+- name: create dir
+  become: true
+  file: path="{{youtrack_install_folder}}/youtrack-{{youtrack_version}}" state=directory owner="{{youtrack_user}}" group="{{youtrack_group}}" mode="777"
+
+- name: untar youtrack
+  become: yes
+  unarchive: src="{{download_directory}}/youtrack{{youtrack_version}}.zip" dest="{{youtrack_install_folder}}/youtrack-{{youtrack_version}}" copy=no
+  when: installDir.stat.exists == False
+
+- name: chown youtrackdir
+  become: true
+  file: path="{{youtrack_install_folder}}" state=directory owner="{{youtrack_user}}" group="{{youtrack_group}}" mode="755" recurse=yes
+
+- name: symlik to latest folder
+  become: true
+  file: dest="{{youtrack_install_folder}}/latest" src="{{youtrack_install_folder}}//youtrack-{{youtrack_version}}" state=link owner="{{youtrack_user}}" group="{{youtrack_group}}" mode="777"
+
+- name: symlik to latest folder
+  become: true
+  file: dest="/etc/init.d/youtrack" src="{{youtrack_install_folder}}/latest/bin/youtrack.sh" state=link owner="{{youtrack_user}}" group="{{youtrack_group}}" mode="777"
+
+
+
+

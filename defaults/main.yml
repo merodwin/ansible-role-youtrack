@@ -1,0 +1,11 @@
+---
+# defaults file for ansible-role-youtrack/
+
+youtrack_version: "6.5.17105"
+download_directory: "/tmp/"
+youtrack_install_folder: "/opt/youtrack"
+youtrack_data_path: "{{youtrack_install_folder}}/data"
+youtrack_user: "youtrack"
+youtrack_group: "youtrack"
+youtrack_http_port: "8080"
+
