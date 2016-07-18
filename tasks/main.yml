@@ -16,8 +16,14 @@
   become: yes
   user: name="{{youtrack_user}}" group={{youtrack_group}} state=present
 
+- name: stat download file
+  stat: path="{{download_directory}}youtrack{{youtrack_version}}.zip"
+  register: youtrack_zip
+#- name: download youtrack
+#  get_url: url="https://download-cf.jetbrains.com/charisma/youtrack-{{youtrack_version}}.zip" dest="{{download_directory}}youtrack{{youtrack_version}}.zip" validate_certs=False
 - name: download youtrack
-  get_url: url="https://download-cf.jetbrains.com/charisma/youtrack-{{youtrack_version}}.zip" dest="{{download_directory}}/youtrack{{youtrack_version}}.zip" validate_certs=False
+  command: "wget https://download-cf.jetbrains.com/charisma/youtrack-{{youtrack_version}}.zip  -O {{download_directory}}youtrack{{youtrack_version}}.zip"
+  when: youtrack_zip.stat.exists == False
 
 - name: check if allredy installed
   stat: path="{{youtrack_install_folder}}/youtrack-{{youtrack_version}}"
