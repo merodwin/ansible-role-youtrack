@@ -1,17 +1,48 @@
- #!/bin/sh
- # /etc/init.d/teamcity -  startup script for teamcity
- export TEAMCITY_DATA_PATH="{{teamcity_data_path}}"
- export TEAMCITY_SERVER_OPTS=-Djava.awt.headless=true # Configure TeamCity for use on a headless OS.
-        
- case $1 in
- start)
-  start-stop-daemon --start  -c teamcity --exec {{teamcity_install_folder}}/latest/bin/runAll.sh start
- ;;
-        
- stop)
-  start-stop-daemon --start -c teamcity  --exec  {{teamcity_install_folder}}/latest//bin/runAll.sh stop
- ;;
-        
- esac
-        
- exit 0
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides: youtrack
+# Required-Start: $local_fs $remote_fs
+# Required-Stop: $local_fs $remote_fs
+# Default-Start: 2 3 4 5
+# Default-Stop: S 0 1 6
+# Short-Description: initscript for youtrack
+# Description: initscript for youtrack
+### END INIT INFO
+ 
+export HOME={{youtrack_install_folder}}
+ 
+set -e
+ 
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+NAME=youtrack
+SCRIPT=/usr/local/$NAME/$NAME.sh
+ 
+d_start() {
+su youtrack -l -c "$SCRIPT start"
+}
+ 
+d_stop() {
+su youtrack -l -c "$SCRIPT stop"
+}
+ 
+case "$1" in
+start)
+echo "Starting $NAME..."
+d_start
+;;
+stop)
+echo "Stopping $NAME..."
+d_stop
+;;
+restart|force-reload)
+echo "Restarting $NAME..."
+d_stop
+d_start
+;;
+*)
+echo "Usage: sudo /etc/init.d/youtrack {start|stop|restart}" >&2
+exit 1
+;;
+esac
+ 
+exit 0
